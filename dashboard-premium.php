@@ -492,7 +492,7 @@ $result = mysqli_query($conn, $query);
         </li>
         <li class="nav-item">
             <a class="nav-link" href="transaksi.php">
-                <i class="fas fa-shopping-cart"></i> Transaksi
+                <i class="fas fa-shopping-cart"></i> Hasil jualan
             </a>
         </li>
         <li class="nav-item">
