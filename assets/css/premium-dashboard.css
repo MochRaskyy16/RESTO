@@ -1,0 +1,716 @@
+/**
+ * premium-dashboard.css
+ * Dashboard Restoran Premium - Modern & Elegant
+ */
+
+ @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+ * {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+ }
+ 
+ body {
+     font-family: 'Poppins', sans-serif;
+     background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+     overflow-x: hidden;
+ }
+ 
+ /* ============================================ */
+ /* SIDEBAR PREMIUM */
+ /* ============================================ */
+ 
+ .sidebar {
+     position: fixed;
+     left: 0;
+     top: 0;
+     width: 280px;
+     height: 100vh;
+     background: linear-gradient(180deg, #2d0000 0%, #4b0000 50%, #6b0000 100%);
+     color: white;
+     transition: all 0.3s ease;
+     z-index: 1000;
+     overflow-y: auto;
+     box-shadow: 5px 0 30px rgba(0, 0, 0, 0.1);
+ }
+ 
+ .sidebar::-webkit-scrollbar {
+     width: 5px;
+ }
+ 
+ .sidebar::-webkit-scrollbar-track {
+     background: rgba(255, 255, 255, 0.1);
+ }
+ 
+ .sidebar::-webkit-scrollbar-thumb {
+     background: rgba(255, 255, 255, 0.3);
+     border-radius: 10px;
+ }
+ 
+ /* Logo Section */
+ .sidebar-logo {
+     padding: 30px 25px;
+     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+     margin-bottom: 20px;
+ }
+ 
+ .sidebar-logo h3 {
+     font-size: 1.5rem;
+     font-weight: 700;
+     margin: 0;
+ }
+ 
+ .sidebar-logo h3 i {
+     margin-right: 10px;
+     font-size: 1.8rem;
+ }
+ 
+ .sidebar-logo p {
+     font-size: 0.75rem;
+     opacity: 0.7;
+     margin-top: 5px;
+     margin-bottom: 0;
+ }
+ 
+ /* Navigation Menu */
+ .sidebar-nav {
+     padding: 0 15px;
+ }
+ 
+ .sidebar-nav .nav-item {
+     list-style: none;
+     margin-bottom: 8px;
+ }
+ 
+ .sidebar-nav .nav-link {
+     display: flex;
+     align-items: center;
+     padding: 12px 18px;
+     color: rgba(255, 255, 255, 0.8);
+     text-decoration: none;
+     border-radius: 12px;
+     transition: all 0.3s ease;
+     font-weight: 500;
+ }
+ 
+ .sidebar-nav .nav-link i {
+     width: 28px;
+     font-size: 1.2rem;
+     margin-right: 12px;
+ }
+ 
+ .sidebar-nav .nav-link:hover {
+     background: rgba(255, 255, 255, 0.15);
+     color: white;
+     transform: translateX(5px);
+ }
+ 
+ .sidebar-nav .nav-link.active {
+     background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+     color: white;
+     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+ }
+ 
+ /* User Profile Sidebar */
+ .sidebar-user {
+     position: absolute;
+     bottom: 0;
+     left: 0;
+     right: 0;
+     padding: 20px;
+     background: rgba(0, 0, 0, 0.3);
+     backdrop-filter: blur(10px);
+     border-top: 1px solid rgba(255, 255, 255, 0.1);
+ }
+ 
+ .user-avatar {
+     width: 50px;
+     height: 50px;
+     border-radius: 50%;
+     background: linear-gradient(135deg, #ffd89b, #c7e9fb);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 1.5rem;
+     font-weight: bold;
+     color: #4b0000;
+ }
+ 
+ .user-info h6 {
+     margin: 0;
+     font-size: 0.9rem;
+     font-weight: 600;
+ }
+ 
+ .user-info p {
+     margin: 0;
+     font-size: 0.7rem;
+     opacity: 0.7;
+ }
+ 
+ .user-status {
+     width: 10px;
+     height: 10px;
+     background: #4ade80;
+     border-radius: 50%;
+     display: inline-block;
+     margin-right: 5px;
+     animation: pulse 2s infinite;
+ }
+ 
+ /* ============================================ */
+ /* MAIN CONTENT */
+ /* ============================================ */
+ 
+ .main-content {
+     margin-left: 280px;
+     padding: 20px;
+     transition: all 0.3s ease;
+ }
+ 
+ /* ============================================ */
+ /* HERO BANNER PREMIUM */
+ /* ============================================ */
+ 
+ .hero-banner {
+     background: linear-gradient(135deg, #4a0000 0%, #7a0000 50%, #9a0000 100%);
+     border-radius: 25px;
+     padding: 40px;
+     margin-bottom: 30px;
+     position: relative;
+     overflow: hidden;
+     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+ }
+ 
+ .hero-banner::before {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path fill="rgba(255,255,255,0.05)" d="M100 0L200 200H0L100 0z"/></svg>');
+     background-size: 60px;
+     opacity: 0.3;
+ }
+ 
+ .hero-content {
+     position: relative;
+     z-index: 2;
+ }
+ 
+ .hero-banner h4 {
+     font-size: 1rem;
+     font-weight: 500;
+     margin-bottom: 15px;
+     opacity: 0.9;
+ }
+ 
+ .hero-banner h1 {
+     font-size: 2.5rem;
+     font-weight: 800;
+     margin-bottom: 15px;
+ }
+ 
+ .gradient-text {
+     background: linear-gradient(135deg, #FFD89B, #FFB347);
+     -webkit-background-clip: text;
+     -webkit-text-fill-color: transparent;
+     background-clip: text;
+ }
+ 
+ .hero-banner p {
+     font-size: 0.95rem;
+     opacity: 0.85;
+     margin-bottom: 0;
+ }
+ 
+ /* Floating Food Images */
+ .floating-food {
+     position: relative;
+     height: 100%;
+     min-height: 250px;
+ }
+ 
+ .food-float {
+     position: absolute;
+     border-radius: 20px;
+     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+     animation: float 3s ease-in-out infinite;
+ }
+ 
+ .food-float img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     border-radius: 20px;
+ }
+ 
+ .food-1 {
+     width: 120px;
+     height: 120px;
+     top: 10%;
+     right: 20%;
+     animation-delay: 0s;
+ }
+ 
+ .food-2 {
+     width: 100px;
+     height: 100px;
+     bottom: 20%;
+     right: 5%;
+     animation-delay: 0.5s;
+ }
+ 
+ .food-3 {
+     width: 90px;
+     height: 90px;
+     top: 50%;
+     right: 40%;
+     animation-delay: 1s;
+ }
+ 
+ .food-4 {
+     width: 80px;
+     height: 80px;
+     bottom: 10%;
+     right: 55%;
+     animation-delay: 1.5s;
+ }
+ 
+ .food-5 {
+     width: 110px;
+     height: 110px;
+     top: 15%;
+     right: 65%;
+     animation-delay: 0.8s;
+ }
+ 
+ @keyframes float {
+     0%, 100% { transform: translateY(0px); }
+     50% { transform: translateY(-15px); }
+ }
+ 
+ /* Particle Effect */
+ .particle {
+     position: absolute;
+     background: rgba(255, 255, 255, 0.3);
+     border-radius: 50%;
+     pointer-events: none;
+     animation: particleFloat 4s ease-in-out infinite;
+ }
+ 
+ @keyframes particleFloat {
+     0% {
+         transform: translateY(0) scale(1);
+         opacity: 0;
+     }
+     50% {
+         opacity: 0.5;
+     }
+     100% {
+         transform: translateY(-100px) scale(0);
+         opacity: 0;
+     }
+ }
+ 
+ /* ============================================ */
+ /* STATISTIK CARDS PREMIUM */
+ /* ============================================ */
+ 
+ .stat-card {
+     background: white;
+     border-radius: 25px;
+     padding: 25px;
+     margin-bottom: 25px;
+     transition: all 0.3s ease;
+     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+     position: relative;
+     overflow: hidden;
+ }
+ 
+ .stat-card:hover {
+     transform: translateY(-5px);
+     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+ }
+ 
+ .stat-card::before {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 5px;
+     height: 100%;
+     background: linear-gradient(180deg, #4a0000, #9a0000);
+ }
+ 
+ .stat-icon {
+     width: 60px;
+     height: 60px;
+     background: linear-gradient(135deg, #ffd89b, #ffb347);
+     border-radius: 18px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 1.8rem;
+     color: #4a0000;
+     margin-bottom: 15px;
+ }
+ 
+ .stat-card h3 {
+     font-size: 2rem;
+     font-weight: 800;
+     margin-bottom: 5px;
+     color: #1a1a1a;
+ }
+ 
+ .stat-card p {
+     color: #6c757d;
+     margin-bottom: 10px;
+     font-weight: 500;
+ }
+ 
+ .stat-trend {
+     font-size: 0.8rem;
+     font-weight: 600;
+ }
+ 
+ .stat-trend.up {
+     color: #10b981;
+ }
+ 
+ .stat-trend.down {
+     color: #ef4444;
+ }
+ 
+ /* ============================================ */
+ /* SEARCH SECTION PREMIUM */
+ /* ============================================ */
+ 
+ .search-section {
+     background: rgba(255, 255, 255, 0.95);
+     backdrop-filter: blur(10px);
+     border-radius: 20px;
+     padding: 20px;
+     margin-bottom: 25px;
+     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+ }
+ 
+ .search-input-group {
+     position: relative;
+ }
+ 
+ .search-input-group i {
+     position: absolute;
+     left: 18px;
+     top: 50%;
+     transform: translateY(-50%);
+     color: #9a0000;
+     font-size: 1rem;
+ }
+ 
+ .search-input-group input {
+     padding-left: 45px;
+     height: 50px;
+     border-radius: 15px;
+     border: 1px solid #e5e7eb;
+     font-family: 'Poppins', sans-serif;
+ }
+ 
+ .search-input-group input:focus {
+     border-color: #9a0000;
+     box-shadow: 0 0 0 3px rgba(154, 0, 0, 0.1);
+ }
+ 
+ .btn-premium {
+     background: linear-gradient(135deg, #4a0000, #9a0000);
+     color: white;
+     border: none;
+     border-radius: 15px;
+     padding: 12px 30px;
+     font-weight: 600;
+     transition: all 0.3s ease;
+     height: 50px;
+ }
+ 
+ .btn-premium:hover {
+     transform: translateY(-2px);
+     box-shadow: 0 5px 15px rgba(74, 0, 0, 0.3);
+     color: white;
+ }
+ 
+ /* ============================================ */
+ /* TABLE PREMIUM */
+ /* ============================================ */
+ 
+ .table-premium {
+     background: white;
+     border-radius: 20px;
+     overflow: hidden;
+     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+ }
+ 
+ .table-premium thead th {
+     background: linear-gradient(135deg, #4a0000, #7a0000);
+     color: white;
+     border: none;
+     padding: 15px;
+     font-weight: 600;
+     font-size: 0.85rem;
+ }
+ 
+ .table-premium tbody tr {
+     transition: all 0.3s ease;
+ }
+ 
+ .table-premium tbody tr:hover {
+     background: rgba(154, 0, 0, 0.05);
+     transform: scale(1.01);
+ }
+ 
+ .table-premium td {
+     vertical-align: middle;
+     padding: 12px;
+ }
+ 
+ /* Food Image */
+ .food-img {
+     width: 70px;
+     height: 70px;
+     border-radius: 15px;
+     object-fit: cover;
+     transition: all 0.3s ease;
+     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+ }
+ 
+ .food-img:hover {
+     transform: scale(1.1);
+     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+ }
+ 
+ /* Category Badges */
+ .badge-makanan { background: #ef4444; }
+ .badge-minuman { background: #06b6d4; }
+ .badge-dessert { background: #a855f7; }
+ .badge-snack { background: #f59e0b; }
+ 
+ .badge-custom {
+     padding: 6px 15px;
+     border-radius: 20px;
+     font-weight: 500;
+     font-size: 0.75rem;
+ }
+ 
+ /* Action Buttons */
+ .btn-action {
+     padding: 8px 15px;
+     border-radius: 10px;
+     font-size: 0.8rem;
+     font-weight: 500;
+     transition: all 0.3s ease;
+     margin: 0 3px;
+ }
+ 
+ .btn-edit {
+     background: #facc15;
+     color: #1a1a1a;
+     border: none;
+ }
+ 
+ .btn-edit:hover {
+     background: #eab308;
+     transform: translateY(-2px);
+     box-shadow: 0 4px 10px rgba(250, 204, 21, 0.3);
+ }
+ 
+ .btn-delete {
+     background: #ef4444;
+     color: white;
+     border: none;
+ }
+ 
+ .btn-delete:hover {
+     background: #dc2626;
+     transform: translateY(-2px);
+     box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+ }
+ 
+ /* ============================================ */
+ /* FOOTER PREMIUM */
+ /* ============================================ */
+ 
+ .footer-premium {
+     background: white;
+     border-radius: 20px;
+     padding: 20px;
+     margin-top: 30px;
+     text-align: center;
+     box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+ }
+ 
+ .footer-premium p {
+     margin: 0;
+     color: #6c757d;
+     font-size: 0.85rem;
+ }
+ 
+ /* ============================================ */
+ /* RESPONSIVE */
+ /* ============================================ */
+ 
+ @media (max-width: 992px) {
+     .sidebar {
+         transform: translateX(-100%);
+     }
+     
+     .sidebar.show {
+         transform: translateX(0);
+     }
+     
+     .main-content {
+         margin-left: 0;
+     }
+     
+     .menu-toggle {
+         display: block !important;
+     }
+ }
+ 
+ @media (max-width: 768px) {
+     .hero-banner h1 {
+         font-size: 1.5rem;
+     }
+     
+     .floating-food {
+         display: none;
+     }
+     
+     .stat-card h3 {
+         font-size: 1.3rem;
+     }
+     
+     .table-premium {
+         font-size: 0.75rem;
+     }
+     
+     .food-img {
+         width: 45px;
+         height: 45px;
+     }
+ }
+ 
+ /* ============================================ */
+ /* ANIMATIONS */
+ /* ============================================ */
+ 
+ @keyframes fadeUp {
+     from {
+         opacity: 0;
+         transform: translateY(30px);
+     }
+     to {
+         opacity: 1;
+         transform: translateY(0);
+     }
+ }
+ 
+ @keyframes pulse {
+     0%, 100% { opacity: 1; }
+     50% { opacity: 0.5; }
+ }
+ 
+ @keyframes slideIn {
+     from {
+         opacity: 0;
+         transform: translateX(-30px);
+     }
+     to {
+         opacity: 1;
+         transform: translateX(0);
+     }
+ }
+ 
+ .fade-up {
+     animation: fadeUp 0.8s ease forwards;
+ }
+ 
+ .slide-in {
+     animation: slideIn 0.6s ease forwards;
+ }
+ 
+ /* Ripple Effect */
+ .ripple {
+     position: relative;
+     overflow: hidden;
+ }
+ 
+ .ripple:after {
+     content: '';
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     width: 0;
+     height: 0;
+     border-radius: 50%;
+     background: rgba(255, 255, 255, 0.5);
+     transform: translate(-50%, -50%);
+     transition: width 0.6s, height 0.6s;
+ }
+ 
+ .ripple:active:after {
+     width: 300px;
+     height: 300px;
+ }
+ 
+ /* Loading Spinner */
+ .spinner-overlay {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: rgba(0, 0, 0, 0.7);
+     z-index: 9999;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     opacity: 0;
+     visibility: hidden;
+     transition: all 0.3s ease;
+ }
+ 
+ .spinner-overlay.show {
+     opacity: 1;
+     visibility: visible;
+ }
+ 
+ .spinner {
+     width: 60px;
+     height: 60px;
+     border: 4px solid rgba(255, 255, 255, 0.3);
+     border-top-color: #ffb347;
+     border-radius: 50%;
+     animation: spin 1s linear infinite;
+ }
+ 
+ @keyframes spin {
+     to { transform: rotate(360deg); }
+ }
+ 
+ /* Menu Toggle Button */
+ .menu-toggle {
+     display: none;
+     position: fixed;
+     top: 20px;
+     left: 20px;
+     z-index: 1100;
+     background: #4a0000;
+     color: white;
+     border: none;
+     width: 45px;
+     height: 45px;
+     border-radius: 12px;
+     font-size: 1.2rem;
+     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+ }
