@@ -1,4 +1,17 @@
 <?php
+// Mulai session
+session_start();
+
+// Cek apakah admin sudah login
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    // Jika belum login, redirect ke halaman login
+    header("Location: login.php");
+    exit();
+}
+
+// Jika sudah login, lanjutkan kode berikutnya...
+require_once 'database.php';
+// ... kode selanjutnya
 /**
  * dashboard-premium.php - Dashboard Restoran Premium
  * Redesign modern dengan sidebar, hero banner, dan animasi
@@ -38,14 +51,30 @@ if (mysqli_num_rows($check_column) > 0) {
 $result_menu_baru = mysqli_query($conn, $query_menu_baru);
 $menu_baru = $result_menu_baru ? mysqli_fetch_assoc($result_menu_baru)['total'] : 0;
 
-// Total Pendapatan Hari Ini - cek apakah tabel transaksi ada
-$check_transaksi = mysqli_query($conn, "SHOW TABLES LIKE 'transaksi'");
-if (mysqli_num_rows($check_transaksi) > 0) {
-    $query_pendapatan = "SELECT COALESCE(SUM(total_harga), 0) as total FROM transaksi WHERE DATE(tanggal) = CURDATE()";
+// ==============================================
+// TOTAL PENDAPATAN HARI INI
+// ==============================================
+
+// Cek apakah tabel pesanan ada
+$check_pesanan = mysqli_query($conn, "SHOW TABLES LIKE 'pesanan'");
+if (mysqli_num_rows($check_pesanan) > 0) {
+    // Ambil dari tabel pesanan (pembeli online)
+    $query_pendapatan = "SELECT COALESCE(SUM(total_harga), 0) as total 
+                         FROM pesanan 
+                         WHERE DATE(tanggal_pesan) = CURDATE() 
+                         AND status != 'batal'";
     $result_pendapatan = mysqli_query($conn, $query_pendapatan);
     $pendapatan_hari_ini = $result_pendapatan ? mysqli_fetch_assoc($result_pendapatan)['total'] : 0;
 } else {
-    $pendapatan_hari_ini = 0;
+    // Fallback ke tabel transaksi (jika ada)
+    $check_transaksi = mysqli_query($conn, "SHOW TABLES LIKE 'transaksi'");
+    if (mysqli_num_rows($check_transaksi) > 0) {
+        $query_pendapatan = "SELECT COALESCE(SUM(total_harga), 0) as total FROM transaksi WHERE DATE(tanggal) = CURDATE()";
+        $result_pendapatan = mysqli_query($conn, $query_pendapatan);
+        $pendapatan_hari_ini = $result_pendapatan ? mysqli_fetch_assoc($result_pendapatan)['total'] : 0;
+    } else {
+        $pendapatan_hari_ini = 0;
+    }
 }
 
 // ==============================================
@@ -82,6 +111,7 @@ $result = mysqli_query($conn, $query);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
     
     <style>
         /* ============================================ */
@@ -476,23 +506,13 @@ $result = mysqli_query($conn, $query);
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="index.php">
-                <i class="fas fa-list-ul"></i> Menu
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="kategori.php">
-                <i class="fas fa-tags"></i> Kategori
+            <a class="nav-link" href="manajemen_pesanan.php">
+                <i class="fas fa-clipboard-list"></i> Manajemen Pesanan
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="dashboard_analitik.php">
                 <i class="fas fa-chart-line"></i> Analitik Penjualan
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="transaksi.php">
-                <i class="fas fa-shopping-cart"></i> Hasil jualan
             </a>
         </li>
         <li class="nav-item">
@@ -508,16 +528,21 @@ $result = mysqli_query($conn, $query);
     </ul>
     
     <div class="sidebar-user">
-        <div class="d-flex align-items-center">
-            <div class="user-avatar me-3">
-                MR
-            </div>
-            <div class="user-info">
-                <h6>Moch Rasky P</h6>
-                <p><span class="user-status"></span> Online</p>
-            </div>
+    <div class="d-flex align-items-center">
+        <div class="user-avatar me-3">
+            MR
+        </div>
+        <div class="user-info">
+            <h6>Moch Rasky P</h6>
+            <p><span class="user-status"></span> Online</p>
         </div>
     </div>
+    <div class="mt-3">
+        <button onclick="confirmLogout()" class="btn btn-logout w-100">
+            <i class="fas fa-sign-out-alt me-2"></i> Logout
+        </button>
+    </div>
+</div>
 </div>
 
 <!-- ============================================ -->
@@ -543,39 +568,94 @@ $result = mysqli_query($conn, $query);
                 </div>
             </div>
             <div class="col-lg-5">
-                <!-- Floating Food - Menggunakan Gambar Real -->
-                <div class="floating-food">
-                    <div class="food-float food-1">
-                        <div class="food-card-img">
-                            <img src="assets/img/steak.jpg" alt="Steak">
-                            <span>Steak</span>
-                        </div>
-                    </div>
-                    <div class="food-float food-2">
-                        <div class="food-card-img">
-                            <img src="assets/img/pizza.jpg" alt="Pizza">
-                            <span>Pizza</span>
-                        </div>
-                    </div>
-                    <div class="food-float food-3">
-                        <div class="food-card-img">
-                            <img src="assets/img/minuman.png" alt="Minuman">
-                            <span>Minuman</span>
-                        </div>
-                    </div>
-                    <div class="food-float food-4">
-                        <div class="food-card-img">
-                            <img src="assets/img/pasta.png" alt="Pasta">
-                            <span>Pasta</span>
-                        </div>
-                    </div>
-                    <div class="food-float food-5">
-                        <div class="food-card-img">
-                            <img src="assets/img/burger.jpeg" alt="Burger">
-                            <span>Burger</span>
-                        </div>
-                    </div>
-                </div>
+               <!-- Floating Food - Ukuran Besar -->
+<!-- Floating Food - Ukuran Besar dengan posisi acak kiri & kanan -->
+<div class="floating-food">
+    
+    <!-- ========== SISI KANAN (YANG SUDAH ADA) ========== -->
+    
+    <!-- Steak - Kanan Atas -->
+    <div class="food-float food-1" style="width: 165px; height: 165px; top: -5%; right: 11%; position: absolute; animation: float 3s ease-in-out infinite; animation-delay: 0s; z-index: 5;">
+        <div class="food-card-img" style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <img src="assets/img/steak.jpg" alt="Steak" style="width: 135px; height: 135px; object-fit: cover; border-radius: 15px;">
+            <span style="font-size: 1rem; font-weight: 600; color: #4a0000; margin-top: 10px;">Steak</span>
+        </div>
+    </div>
+    
+    <!-- Pizza - Kanan Bawah -->
+    <div class="food-float food-2" style="width: 165px; height: 165px; bottom: -13%; right: -3%; position: absolute; animation: float 3s ease-in-out infinite; animation-delay: 0.3s; z-index: 4;">
+        <div class="food-card-img" style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <img src="assets/img/pizza.jpg" alt="Pizza" style="width: 135px; height: 135px; object-fit: cover; border-radius: 15px;">
+            <span style="font-size: 0.95rem; font-weight: 600; color: #4a0000; margin-top: 10px;">Pizza</span>
+        </div>
+    </div>
+    
+    <!-- Minuman - Kanan Tengah -->
+    <div class="food-float food-3" style="width: 165px; height: 165px; top: -12%; right: 43%; position: absolute; animation: float 3s ease-in-out infinite; animation-delay: 0.6s; z-index: 3;">
+        <div class="food-card-img" style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 12px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <img src="assets/img/minuman.png" alt="Minuman" style="width: 135px; height: 135px; object-fit: cover; border-radius: 15px;">
+            <span style="font-size: 0.9rem; font-weight: 600; color: #4a0000; margin-top: 10px;">Minuman</span>
+        </div>
+    </div>
+    
+    <!-- Pasta - Kanan Tengah Bawah -->
+    <div class="food-float food-4" style="width: 165px; height: 165px; top: 35%; right: 29%; position: absolute; animation: float 3s ease-in-out infinite; animation-delay: 0.9s; z-index: 2;">
+        <div class="food-card-img" style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <img src="assets/img/pasta.png" alt="Pasta" style="width: 135px; height: 135px; object-fit: cover; border-radius: 15px;">
+            <span style="font-size: 1rem; font-weight: 600; color: #4a0000; margin-top: 10px;">Pasta</span>
+        </div>
+    </div>
+    
+    <!-- Burger - Kanan Atas Tengah -->
+    <div class="food-float food-5" style="width: 165px; height: 165px; top: 43%; left: 23%; position: absolute; animation: float 3s ease-in-out infinite; animation-delay: 1.2s; z-index: 6;">
+        <div class="food-card-img" style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 13px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <img src="assets/img/burger.jpeg" alt="Burger" style="width: 135px; height: 135px; object-fit: cover; border-radius: 15px;">
+            <span style="font-size: 0.95rem; font-weight: 600; color: #4a0000; margin-top: 10px;">Burger</span>
+        </div>
+    </div>
+    
+    <!-- ========== SISI KIRI (TAMBAHAN BARU) ========== -->
+    
+    <!-- Sate - Kiri Atas -->
+    <div class="food-float" style="width: 165px; height: 165px; top: -8%; left: -16%; position: absolute; animation: float 3.5s ease-in-out infinite; animation-delay: 0.2s; z-index: 5;">
+        <div class="food-card-img" style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <img src="assets/img/soto.png" alt="Sate" style="width: 135px; height: 135px; object-fit: cover; border-radius: 25px;">
+            <span style="font-size: 0.9rem; font-weight: 600; color: #4a0000; margin-top: 8px;">Soto</span>
+        </div>
+    </div>
+    
+    <!-- Nasi Goreng - Kiri Tengah -->
+    <div class="food-float" style="width: 180px; height: 180px; top: -9%; left: -45%; position: absolute; animation: float 2.8s ease-in-out infinite; animation-delay: 0.7s; z-index: 4;">
+        <div class="food-card-img" style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 14px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <img src="assets/img/dessert.png" alt="Nasi Goreng" style="width: 135px; height: 135px; object-fit: cover; border-radius: 15px;">
+            <span style="font-size: 0.95rem; font-weight: 600; color: #4a0000; margin-top: 8px;">Dessert</span>
+        </div>
+    </div>
+    
+    <!-- Mie Ayam - Kiri Bawah -->
+    <div class="food-float" style="width: 165px; height: 165px; bottom: -15%; left: -2%; position: absolute; animation: float 3.2s ease-in-out infinite; animation-delay: 1.1s; z-index: 3;">
+        <div class="food-card-img" style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 12px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <img src="assets/img/Nasgor.png" alt="Mie Ayam" style="width: 135px; height: 135px; object-fit: cover; border-radius: 15px;">
+            <span style="font-size: 0.9rem; font-weight: 600; color: #4a0000; margin-top: 8px;">Nasi Goreng</span>
+        </div>
+    </div>
+    
+    <!-- Es Teh - Kiri Atas Tengah -->
+    <div class="food-float" style="width: 165px; height: 165px; top: -10%; left: 13%; position: absolute; animation: float 2.5s ease-in-out infinite; animation-delay: 0.4s; z-index: 6;">
+        <div class="food-card-img" style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 10px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <img src="assets/img/cumi.jpg" alt="Cumi " style="width: 130px; height: 130px; object-fit: cover; border-radius: 15px;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: #4a0000; margin-top: 8px;">Cumi Asam Manis</span>
+        </div>
+    </div>
+    
+    <!-- Kentang Goreng - Kiri Pojok -->
+    <div class="food-float" style="width: 165px; height: 165px; top: 50%; left: -28%; position: absolute; animation: float 2.9s ease-in-out infinite; animation-delay: 0.9s; z-index: 1;">
+        <div class="food-card-img" style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 12px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <img src="assets/img/kentang.png" alt="Kentang Goreng" style="width: 135px; height: 135px; object-fit: cover; border-radius: 15px;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: #4a0000; margin-top: 8px;">Kentang</span>
+        </div>
+    </div>
+</div>
             </div>
         </div>
     </div>
@@ -798,7 +878,45 @@ function confirmDelete(id, nama) {
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 <?php endif; ?>
+
+// ============================================
+// FUNGSI KONFIRMASI LOGOUT
+// ============================================
+function confirmLogout() {
+    Swal.fire({
+        title: 'Yakin ingin logout?',
+        text: 'Anda akan keluar dari panel admin',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Logout!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Logout...',
+                text: 'Sedang memproses logout',
+                icon: 'info',
+                showConfirmButton: false,
+                timer: 1000
+            });
+            
+            setTimeout(() => {
+                window.location.href = 'logout.php';
+            }, 1000);
+        }
+    });
+}
+
+// Fungsi lainnya (toggle sidebar, dll) bisa ditambahkan di sini juga
+function toggleSidebar() {
+    var sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.toggle('show');
+}
 </script>
 
+</body>
+</html>
 </body>
 </html>

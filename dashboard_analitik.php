@@ -1,10 +1,17 @@
 <?php
 /**
  * dashboard_analitik.php - Halaman Dashboard Analitik Penjualan
- * Menampilkan statistik penjualan, grafik batang, grafik garis, dan tabel penjualan
+ * Tampilan selaras dengan dashboard premium
  */
 
 require_once 'database.php';
+
+// ==============================================
+// CEK KONEKSI DATABASE
+// ==============================================
+if (!$conn) {
+    die("Koneksi database gagal: " . mysqli_connect_error());
+}
 
 // ==============================================
 // 1. AMBIL DATA STATISTIK RINGKASAN
@@ -13,17 +20,17 @@ require_once 'database.php';
 // Total Penjualan Hari Ini
 $query_hari_ini = "SELECT COALESCE(SUM(total_harga), 0) as total FROM transaksi WHERE DATE(tanggal) = CURDATE()";
 $result_hari_ini = mysqli_query($conn, $query_hari_ini);
-$total_hari_ini = mysqli_fetch_assoc($result_hari_ini)['total'];
+$total_hari_ini = $result_hari_ini ? mysqli_fetch_assoc($result_hari_ini)['total'] : 0;
 
 // Total Penjualan Minggu Ini
 $query_minggu_ini = "SELECT COALESCE(SUM(total_harga), 0) as total FROM transaksi WHERE YEARWEEK(tanggal, 1) = YEARWEEK(CURDATE(), 1)";
 $result_minggu_ini = mysqli_query($conn, $query_minggu_ini);
-$total_minggu_ini = mysqli_fetch_assoc($result_minggu_ini)['total'];
+$total_minggu_ini = $result_minggu_ini ? mysqli_fetch_assoc($result_minggu_ini)['total'] : 0;
 
 // Total Transaksi Minggu Ini
 $query_transaksi_minggu = "SELECT COUNT(*) as total FROM transaksi WHERE YEARWEEK(tanggal, 1) = YEARWEEK(CURDATE(), 1)";
 $result_transaksi_minggu = mysqli_query($conn, $query_transaksi_minggu);
-$total_transaksi_minggu = mysqli_fetch_assoc($result_transaksi_minggu)['total'];
+$total_transaksi_minggu = $result_transaksi_minggu ? mysqli_fetch_assoc($result_transaksi_minggu)['total'] : 0;
 
 // Menu Terlaris Minggu Ini
 $query_menu_terlaris = "SELECT 
@@ -42,44 +49,7 @@ $nama_menu_terlaris = $menu_terlaris ? $menu_terlaris['nama_menu'] : 'Belum ada 
 $jumlah_menu_terlaris = $menu_terlaris ? $menu_terlaris['total_terjual'] : 0;
 
 // ==============================================
-// 2. AMBIL DATA PENJUALAN 1 MINGGU KEBELAKANG & 1 MINGGU KEDEPAN
-// ==============================================
-
-// Buat array tanggal untuk 14 hari (7 hari lalu sampai 7 hari ke depan)
-$dates = [];
-$current = strtotime('-7 days');
-$end = strtotime('+7 days');
-
-while ($current <= $end) {
-    $dates[date('Y-m-d', $current)] = [
-        'tanggal' => date('Y-m-d', $current),
-        'tanggal_format' => date('d M Y', $current),
-        'total_transaksi' => 0,
-        'total_pendapatan' => 0
-    ];
-    $current = strtotime('+1 day', $current);
-}
-
-// Ambil data transaksi dari database
-$query_penjualan = "SELECT 
-    DATE(tanggal) as tanggal,
-    COUNT(*) as jumlah_transaksi,
-    SUM(total_harga) as total_pendapatan
-FROM transaksi
-WHERE tanggal BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
-GROUP BY DATE(tanggal)
-ORDER BY tanggal ASC";
-
-$result_penjualan = mysqli_query($conn, $query_penjualan);
-while ($row = mysqli_fetch_assoc($result_penjualan)) {
-    if (isset($dates[$row['tanggal']])) {
-        $dates[$row['tanggal']]['total_transaksi'] = (int)$row['jumlah_transaksi'];
-        $dates[$row['tanggal']]['total_pendapatan'] = (float)$row['total_pendapatan'];
-    }
-}
-
-// ==============================================
-// 3. DATA UNTUK GRAFIK BATANG (MENU TERLARIS)
+// 2. DATA UNTUK GRAFIK BATANG (MENU TERLARIS)
 // ==============================================
 
 $query_bar_chart = "SELECT 
@@ -90,7 +60,7 @@ LEFT JOIN detail_transaksi dt ON m.id = dt.id_menu
 LEFT JOIN transaksi t ON dt.id_transaksi = t.id
 GROUP BY m.id
 ORDER BY total_terjual DESC
-LIMIT 10"; // Ambil 10 menu terlaris
+LIMIT 10";
 
 $result_bar_chart = mysqli_query($conn, $query_bar_chart);
 $menu_names = [];
@@ -102,7 +72,7 @@ while ($row = mysqli_fetch_assoc($result_bar_chart)) {
 }
 
 // ==============================================
-// 4. DATA UNTUK GRAFIK GARIS (TREND MENU TERLARIS)
+// 3. DATA UNTUK GRAFIK GARIS (TREND MENU TERLARIS)
 // ==============================================
 
 // Cari menu terlaris sepanjang masa
@@ -155,6 +125,41 @@ if ($top_menu_id > 0) {
 }
 
 $line_chart_data = array_values($line_chart_sales);
+
+// ==============================================
+// 4. DATA PENJUALAN 1 MINGGU KEBELAKANG & 1 MINGGU KEDEPAN
+// ==============================================
+
+$dates = [];
+$current = strtotime('-7 days');
+$end = strtotime('+7 days');
+
+while ($current <= $end) {
+    $dates[date('Y-m-d', $current)] = [
+        'tanggal' => date('Y-m-d', $current),
+        'tanggal_format' => date('d M Y', $current),
+        'total_transaksi' => 0,
+        'total_pendapatan' => 0
+    ];
+    $current = strtotime('+1 day', $current);
+}
+
+$query_penjualan = "SELECT 
+    DATE(tanggal) as tanggal,
+    COUNT(*) as jumlah_transaksi,
+    SUM(total_harga) as total_pendapatan
+FROM transaksi
+WHERE tanggal BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+GROUP BY DATE(tanggal)
+ORDER BY tanggal ASC";
+
+$result_penjualan = mysqli_query($conn, $query_penjualan);
+while ($row = mysqli_fetch_assoc($result_penjualan)) {
+    if (isset($dates[$row['tanggal']])) {
+        $dates[$row['tanggal']]['total_transaksi'] = (int)$row['jumlah_transaksi'];
+        $dates[$row['tanggal']]['total_pendapatan'] = (float)$row['total_pendapatan'];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -162,288 +167,460 @@ $line_chart_data = array_values($line_chart_sales);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Analitik Penjualan</title>
+    <title>Analitik Penjualan - Loehoer Restaurant</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Custom CSS -->
+    
     <style>
-        :root {
-            --primary-color: #800000;
-            --primary-dark: #5c0000;
-            --primary-light: #a52a2a;
-            --secondary-color: #6c757d;
-            --light-gray: #f8f9fa;
-            --white: #ffffff;
-            --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 1rem 2rem rgba(0, 0, 0, 0.12);
-            --border-radius: 16px;
+        /* ============================================ */
+        /* PREMIUM DASHBOARD CSS - SAMA DENGAN DASHBOARD */
+        /* ============================================ */
+        
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
+        
         body {
-            background-color: #f0f2f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            overflow-x: hidden;
         }
-
-        /* Navbar */
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            box-shadow: var(--shadow);
-            padding: 1rem 0;
+        
+        /* Loading Spinner */
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
-
-        .navbar-brand {
+        .spinner-overlay.show { opacity: 1; visibility: visible; }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffb347;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #2d0000 0%, #4b0000 50%, #6b0000 100%);
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 10px; }
+        
+        .sidebar-logo { padding: 30px 25px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; }
+        .sidebar-logo h3 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+        .sidebar-logo h3 i { margin-right: 10px; font-size: 1.8rem; }
+        .sidebar-logo p { font-size: 0.75rem; opacity: 0.7; margin-top: 5px; margin-bottom: 0; }
+        
+        .sidebar-nav { padding: 0 15px; }
+        .sidebar-nav .nav-item { list-style: none; margin-bottom: 8px; }
+        .sidebar-nav .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 18px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .sidebar-nav .nav-link i { width: 28px; font-size: 1.2rem; margin-right: 12px; }
+        .sidebar-nav .nav-link:hover { background: rgba(255, 255, 255, 0.15); color: white; transform: translateX(5px); }
+        .sidebar-nav .nav-link.active { background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)); color: white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+        
+        .sidebar-user {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd89b, #c7e9fb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 1.5rem;
             font-weight: bold;
-            color: var(--white) !important;
+            color: #4b0000;
         }
-
-        .navbar-brand i {
-            margin-right: 10px;
+        .user-info h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
+        .user-info p { margin: 0; font-size: 0.7rem; opacity: 0.7; }
+        .user-status { width: 10px; height: 10px; background: #4ade80; border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        /* Main Content */
+        .main-content { margin-left: 280px; padding: 20px; transition: all 0.3s ease; }
+        
+        /* Hero Banner Mini */
+        .hero-banner-mini {
+            background: linear-gradient(135deg, #4a0000 0%, #7a0000 50%, #9a0000 100%);
+            border-radius: 25px;
+            padding: 30px 40px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 500;
-            transition: all 0.3s ease;
+        .hero-banner-mini::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path fill="rgba(255,255,255,0.05)" d="M100 0L200 200H0L100 0z"/></svg>');
+            background-size: 60px;
+            opacity: 0.3;
         }
-
-        .nav-link:hover {
-            color: var(--white) !important;
-            transform: translateY(-2px);
-        }
-
-        .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-        }
-
-        /* Card Statistik */
+        .hero-content { position: relative; z-index: 2; }
+        .hero-banner-mini h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; color: white; }
+        .hero-banner-mini p { font-size: 0.95rem; opacity: 0.85; margin-bottom: 0; color: white; }
+        .gradient-text { background: linear-gradient(135deg, #FFD89B, #FFB347); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        
+        /* Stat Cards */
         .stat-card {
-            border: none;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            margin-bottom: 25px;
             transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            position: relative;
             overflow: hidden;
         }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .stat-card .card-body {
-            padding: 1.5rem;
-        }
-
-        .stat-card h3 {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-card p {
-            margin-bottom: 0;
-            color: var(--secondary-color);
-        }
-
-        .stat-icon {
-            font-size: 2.5rem;
-            opacity: 0.3;
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); }
+        .stat-card::before {
+            content: '';
             position: absolute;
-            right: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, #4a0000, #9a0000);
         }
-
-        .stat-card-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-            color: white;
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ffd89b, #ffb347);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #4a0000;
+            margin-bottom: 15px;
         }
-
-        .stat-card-primary p {
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .stat-card-success {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-        }
-
-        .stat-card-info {
-            background: linear-gradient(135deg, #17a2b8, #6f42c1);
-            color: white;
-        }
-
-        .stat-card-warning {
-            background: linear-gradient(135deg, #ffc107, #fd7e14);
-            color: white;
-        }
-
+        .stat-card h3 { font-size: 2rem; font-weight: 800; margin-bottom: 5px; color: #1a1a1a; }
+        .stat-card p { color: #6c757d; margin-bottom: 10px; font-weight: 500; }
+        .stat-trend { font-size: 0.8rem; font-weight: 600; }
+        .stat-trend.up { color: #10b981; }
+        .stat-trend.down { color: #ef4444; }
+        
         /* Chart Container */
         .chart-container {
             background: white;
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow);
+            border-radius: 25px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
         }
-
+        .chart-container:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12); }
+        
         .chart-title {
             font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--primary-color);
-            border-left: 4px solid var(--primary-color);
-            padding-left: 1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #4a0000;
+            border-left: 4px solid #4a0000;
+            padding-left: 15px;
         }
-
-        /* Tabel */
+        
+        /* Table Container */
         .table-container {
             background: white;
-            border-radius: var(--border-radius);
+            border-radius: 25px;
             overflow: hidden;
-            box-shadow: var(--shadow);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         }
-
-        .table thead th {
-            background-color: var(--primary-color);
+        .table-container thead th {
+            background: linear-gradient(135deg, #4a0000, #7a0000);
             color: white;
             border: none;
-            padding: 1rem;
+            padding: 15px;
             font-weight: 600;
+            font-size: 0.85rem;
         }
-
-        .table tbody tr:hover {
-            background-color: rgba(128, 0, 0, 0.05);
+        .table-container tbody tr:hover { background: rgba(154, 0, 0, 0.05); }
+        .table-container td { vertical-align: middle; padding: 12px; }
+        
+        /* Badge */
+        .badge-custom { padding: 6px 15px; border-radius: 20px; font-weight: 500; font-size: 0.75rem; color: white; }
+        .badge-primary { background: #4a0000; }
+        
+        /* Footer */
+        .footer-premium {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
         }
-
+        .footer-premium p { margin: 0; color: #6c757d; font-size: 0.85rem; }
+        
         /* Responsive */
-        @media (max-width: 768px) {
-            .stat-card h3 {
-                font-size: 1.5rem;
-            }
-            
-            .chart-container {
-                padding: 1rem;
-            }
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block !important; }
         }
+        @media (max-width: 768px) {
+            .hero-banner-mini h1 { font-size: 1.3rem; }
+            .stat-card h3 { font-size: 1.3rem; }
+            .chart-container { padding: 15px; }
+        }
+        
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #4a0000;
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .fade-up {
+            animation: fadeUp 0.8s ease forwards;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .text-muted small { font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="index.php">
-            <i class="fas fa-utensils"></i> RestoManager
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
+<!-- Loading Spinner -->
+<div id="loadingSpinner" class="spinner-overlay">
+    <div class="spinner"></div>
+</div>
+
+<!-- Menu Toggle untuk Mobile -->
+<button class="menu-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- ============================================ -->
+<!-- SIDEBAR PREMIUM -->
+<!-- ============================================ -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <h3>
+            <i class="fas fa-utensils"></i> Loehoer
+        </h3>
+        <p>Restaurant Management System</p>
+    </div>
+    
+    <ul class="sidebar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="dashboard-premium.php">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="tambah.php">
+                <i class="fas fa-plus-circle"></i> Tambah Menu
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="manajemen_pesanan.php">
+                <i class="fas fa-clipboard-list"></i> Manajemen Pesanan
+            </a>
+        </li>
+        
+        <li class="nav-item">
+            <a class="nav-link active" href="dashboard_analitik.php">
+                <i class="fas fa-chart-line"></i> Analitik Penjualan
+            </a>
+        </li>
+        
+        <li class="nav-item">
+            <a class="nav-link" href="laporan.php">
+                <i class="fas fa-file-alt"></i> Laporan
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="pengaturan.php">
+                <i class="fas fa-cog"></i> Pengaturan
+            </a>
+        </li>
+    </ul>
+    
+    <div class="sidebar-user">
+    <div class="d-flex align-items-center">
+        <div class="user-avatar me-3">
+            MR
+        </div>
+        <div class="user-info">
+            <h6>Moch Rasky P</h6>
+            <p><span class="user-status"></span> Online</p>
+        </div>
+    </div>
+    <div class="mt-3">
+        <button onclick="confirmLogout()" class="btn btn-logout w-100">
+            <i class="fas fa-sign-out-alt me-2"></i> Logout
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="index.php">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="tambah.php">
-                        <i class="fas fa-plus-circle"></i> Tambah Menu
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="dashboard_analitik.php">
-                        <i class="fas fa-chart-line"></i> Analitik Penjualan
-                    </a>
-                </li>
-            </ul>
+    </div>
+</div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MAIN CONTENT -->
+<!-- ============================================ -->
+<div class="main-content">
+    
+    <!-- HERO BANNER MINI -->
+    <div class="hero-banner-mini fade-up">
+        <div class="hero-content">
+            <h1>
+                <i class="fas fa-chart-line me-2"></i> 
+                Analitik <span class="gradient-text">Penjualan</span>
+            </h1>
+            <p>Pantau performa penjualan restoran Anda secara real-time</p>
         </div>
     </div>
-</nav>
-
-<div class="container mt-4">
-    <!-- ============================================== -->
-    <!-- RINGKASAN STATISTIK - 4 CARD -->
-    <!-- ============================================== -->
+    
+    <!-- STATISTIK CARDS -->
     <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card stat-card-primary">
-                <div class="card-body position-relative">
-                    <i class="fas fa-money-bill-wave stat-icon"></i>
-                    <h3>Rp <?= number_format($total_hari_ini, 0, ',', '.') ?></h3>
-                    <p>Total Penjualan Hari Ini</p>
-                    <small><i class="fas fa-calendar-day"></i> <?= date('d M Y') ?></small>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card fade-up" style="animation-delay: 0.1s;">
+                <div class="stat-icon">
+                    <i class="fas fa-money-bill-wave"></i>
                 </div>
+                <h3>Rp <?php echo number_format($total_hari_ini, 0, ',', '.'); ?></h3>
+                <p>Total Penjualan Hari Ini</p>
+                <span class="stat-trend up">
+                    <i class="fas fa-calendar-day"></i> <?php echo date('d M Y'); ?>
+                </span>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card stat-card-success">
-                <div class="card-body position-relative">
-                    <i class="fas fa-chart-line stat-icon"></i>
-                    <h3>Rp <?= number_format($total_minggu_ini, 0, ',', '.') ?></h3>
-                    <p>Total Penjualan Minggu Ini</p>
-                    <small><i class="fas fa-calendar-week"></i> Minggu ke-<?= date('W') ?></small>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card fade-up" style="animation-delay: 0.2s;">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
                 </div>
+                <h3>Rp <?php echo number_format($total_minggu_ini, 0, ',', '.'); ?></h3>
+                <p>Total Penjualan Minggu Ini</p>
+                <span class="stat-trend up">
+                    <i class="fas fa-calendar-week"></i> Minggu ke-<?php echo date('W'); ?>
+                </span>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card stat-card-info">
-                <div class="card-body position-relative">
-                    <i class="fas fa-receipt stat-icon"></i>
-                    <h3><?= number_format($total_transaksi_minggu) ?></h3>
-                    <p>Total Transaksi Minggu Ini</p>
-                    <small><i class="fas fa-store"></i> <?= $total_transaksi_minggu ?> transaksi</small>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card fade-up" style="animation-delay: 0.3s;">
+                <div class="stat-icon">
+                    <i class="fas fa-receipt"></i>
                 </div>
+                <h3><?php echo number_format($total_transaksi_minggu); ?></h3>
+                <p>Total Transaksi Minggu Ini</p>
+                <span class="stat-trend up">
+                    <i class="fas fa-store"></i> <?php echo $total_transaksi_minggu; ?> transaksi
+                </span>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card stat-card stat-card-warning">
-                <div class="card-body position-relative">
-                    <i class="fas fa-crown stat-icon"></i>
-                    <h3><?= htmlspecialchars($nama_menu_terlaris) ?></h3>
-                    <p>Menu Terlaris Minggu Ini</p>
-                    <small><i class="fas fa-chart-simple"></i> Terjual <?= $jumlah_menu_terlaris ?> porsi</small>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card fade-up" style="animation-delay: 0.4s;">
+                <div class="stat-icon">
+                    <i class="fas fa-crown"></i>
                 </div>
+                <h3><?php echo htmlspecialchars($nama_menu_terlaris); ?></h3>
+                <p>Menu Terlaris Minggu Ini</p>
+                <span class="stat-trend up">
+                    <i class="fas fa-chart-simple"></i> Terjual <?php echo $jumlah_menu_terlaris; ?> porsi
+                </span>
             </div>
         </div>
     </div>
-
-    <!-- ============================================== -->
+    
     <!-- GRAFIK BATANG - MENU TERLARIS -->
-    <!-- ============================================== -->
-    <div class="chart-container">
+    <div class="chart-container fade-up" style="animation-delay: 0.2s;">
         <div class="chart-title">
             <i class="fas fa-chart-bar me-2"></i> Perbandingan Menu Terlaris
         </div>
         <canvas id="barChart" height="100"></canvas>
-        <div class="text-muted mt-3 small text-center">
+        <div class="text-muted small text-center mt-3">
             <i class="fas fa-info-circle"></i> Menampilkan 10 menu dengan jumlah penjualan tertinggi sepanjang masa
         </div>
     </div>
-
-    <!-- ============================================== -->
+    
     <!-- GRAFIK GARIS - TREND MENU TERLARIS -->
-    <!-- ============================================== -->
-    <div class="chart-container">
+    <div class="chart-container fade-up" style="animation-delay: 0.3s;">
         <div class="chart-title">
-            <i class="fas fa-chart-line me-2"></i> Trend Penjualan Menu Terlaris: <?= htmlspecialchars($top_menu_name) ?>
+            <i class="fas fa-chart-line me-2"></i> Trend Penjualan: <?php echo htmlspecialchars($top_menu_name); ?>
         </div>
         <canvas id="lineChart" height="100"></canvas>
-        <div class="text-muted mt-3 small text-center">
+        <div class="text-muted small text-center mt-3">
             <i class="fas fa-info-circle"></i> Data penjualan 7 hari terakhir untuk menu terlaris
         </div>
     </div>
-
-    <!-- ============================================== -->
+    
     <!-- TABEL RINGKASAN PENJUALAN -->
-    <!-- ============================================== -->
-    <div class="table-container">
+    <div class="table-container fade-up" style="animation-delay: 0.4s;">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
@@ -465,30 +642,38 @@ $line_chart_data = array_values($line_chart_sales);
                         $rata_rata = $date['total_transaksi'] > 0 ? $date['total_pendapatan'] / $date['total_transaksi'] : 0;
                     ?>
                         <tr>
-                            <td class="fw-bold"><?= date('d/m/Y', strtotime($date['tanggal'])) ?></td>
-                            <td><?= tanggal_ke_hari($date['tanggal']) ?></td>
+                            <td class="fw-bold"><?php echo date('d/m/Y', strtotime($date['tanggal'])); ?></td>
+                            <td><?php echo tanggal_ke_hari($date['tanggal']); ?></td>
                             <td>
                                 <?php if ($date['total_transaksi'] > 0): ?>
-                                    <span class="badge bg-primary rounded-pill"><?= number_format($date['total_transaksi']) ?> transaksi</span>
+                                    <span class="badge-custom badge-primary"><?php echo number_format($date['total_transaksi']); ?> transaksi</span>
                                 <?php else: ?>
-                                    <span class="badge bg-secondary rounded-pill">0 transaksi</span>
+                                    <span class="badge-custom" style="background: #6c757d;">0 transaksi</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="fw-bold text-success">Rp <?= number_format($date['total_pendapatan'], 0, ',', '.') ?></td>
-                            <td>Rp <?= number_format($rata_rata, 0, ',', '.') ?></td>
+                            <td class="fw-bold text-success">Rp <?php echo number_format($date['total_pendapatan'], 0, ',', '.'); ?></td>
+                            <td>Rp <?php echo number_format($rata_rata, 0, ',', '.'); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot class="table-light">
                     <tr class="fw-bold">
                         <td colspan="2" class="text-end">TOTAL:</td>
-                        <td><?= number_format($grand_total_transaksi) ?> transaksi</td>
-                        <td>Rp <?= number_format($grand_total_pendapatan, 0, ',', '.') ?></td>
-                        <td>Rp <?= number_format($grand_total_transaksi > 0 ? $grand_total_pendapatan / $grand_total_transaksi : 0, 0, ',', '.') ?></td>
+                        <td><?php echo number_format($grand_total_transaksi); ?> transaksi</td>
+                        <td>Rp <?php echo number_format($grand_total_pendapatan, 0, ',', '.'); ?></td>
+                        <td>Rp <?php echo number_format($grand_total_transaksi > 0 ? $grand_total_pendapatan / $grand_total_transaksi : 0, 0, ',', '.'); ?></td>
                     </tr>
                 </tfoot>
             </table>
         </div>
+    </div>
+    
+    <!-- FOOTER PREMIUM -->
+    <div class="footer-premium">
+        <p>
+            <i class="fas fa-copyright me-1"></i> 2026 Loehoer Restaurant. 
+            Built with <i class="fas fa-heart text-danger"></i> using PHP, Bootstrap & Chart.js
+        </p>
     </div>
 </div>
 
@@ -496,6 +681,20 @@ $line_chart_data = array_values($line_chart_sales);
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+// Loading spinner
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        var spinner = document.getElementById('loadingSpinner');
+        if (spinner) spinner.classList.remove('show');
+    }, 500);
+});
+
+// Toggle sidebar untuk mobile
+function toggleSidebar() {
+    var sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.toggle('show');
+}
+
 // ==============================================
 // GRAFIK BATANG (COLUMN CHART)
 // ==============================================
@@ -503,10 +702,10 @@ const barCtx = document.getElementById('barChart').getContext('2d');
 new Chart(barCtx, {
     type: 'bar',
     data: {
-        labels: <?= json_encode($menu_names) ?>,
+        labels: <?php echo json_encode($menu_names); ?>,
         datasets: [{
             label: 'Jumlah Terjual (porsi)',
-            data: <?= json_encode($menu_sales) ?>,
+            data: <?php echo json_encode($menu_sales); ?>,
             backgroundColor: 'rgba(128, 0, 0, 0.7)',
             borderColor: 'rgba(128, 0, 0, 1)',
             borderWidth: 1,
@@ -533,7 +732,7 @@ new Chart(barCtx, {
                 bodyFont: { size: 12 },
                 callbacks: {
                     label: function(context) {
-                        return `Terjual: ${context.raw} porsi`;
+                        return 'Terjual: ' + context.raw + ' porsi';
                     }
                 }
             }
@@ -573,10 +772,10 @@ const lineCtx = document.getElementById('lineChart').getContext('2d');
 new Chart(lineCtx, {
     type: 'line',
     data: {
-        labels: <?= json_encode($line_chart_dates) ?>,
+        labels: <?php echo json_encode($line_chart_dates); ?>,
         datasets: [{
-            label: 'Penjualan ' + <?= json_encode($top_menu_name) ?> + ' (porsi)',
-            data: <?= json_encode($line_chart_data) ?>,
+            label: 'Penjualan <?php echo addslashes($top_menu_name); ?> (porsi)',
+            data: <?php echo json_encode($line_chart_data); ?>,
             borderColor: 'rgba(128, 0, 0, 1)',
             backgroundColor: 'rgba(128, 0, 0, 0.1)',
             borderWidth: 3,
@@ -606,7 +805,7 @@ new Chart(lineCtx, {
                 bodyFont: { size: 12 },
                 callbacks: {
                     label: function(context) {
-                        return `Terjual: ${context.raw} porsi`;
+                        return 'Terjual: ' + context.raw + ' porsi';
                     }
                 }
             }
@@ -633,10 +832,24 @@ new Chart(lineCtx, {
         }
     }
 });
+// Fungsi konfirmasi logout
+function confirmLogout() {
+    Swal.fire({
+        title: 'Yakin ingin logout?',
+        text: 'Anda akan keluar dari panel admin',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Logout!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = 'logout.php';
+        }
+    });
+}
 </script>
-
-</body>
-</html>
 
 <?php
 /**
@@ -656,3 +869,6 @@ function tanggal_ke_hari($tanggal) {
     return $nama_hari[$hari];
 }
 ?>
+
+</body>
+</html>

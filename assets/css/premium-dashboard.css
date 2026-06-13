@@ -158,6 +158,28 @@
      margin-right: 5px;
      animation: pulse 2s infinite;
  }
+
+ /* Tombol Logout */
+.btn-logout {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-logout:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    transform: translateY(-2px);
+    color: white;
+}
  
  /* ============================================ */
  /* MAIN CONTENT */
@@ -226,66 +248,39 @@
      margin-bottom: 0;
  }
  
- /* Floating Food Images */
- .floating-food {
-     position: relative;
-     height: 100%;
-     min-height: 250px;
- }
- 
- .food-float {
-     position: absolute;
-     border-radius: 20px;
-     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-     animation: float 3s ease-in-out infinite;
- }
- 
- .food-float img {
-     width: 100%;
-     height: 100%;
-     object-fit: cover;
-     border-radius: 20px;
- }
- 
- .food-1 {
-     width: 120px;
-     height: 120px;
-     top: 10%;
-     right: 20%;
-     animation-delay: 0s;
- }
- 
- .food-2 {
-     width: 100px;
-     height: 100px;
-     bottom: 20%;
-     right: 5%;
-     animation-delay: 0.5s;
- }
- 
- .food-3 {
-     width: 90px;
-     height: 90px;
-     top: 50%;
-     right: 40%;
-     animation-delay: 1s;
- }
- 
- .food-4 {
-     width: 80px;
-     height: 80px;
-     bottom: 10%;
-     right: 55%;
-     animation-delay: 1.5s;
- }
- 
- .food-5 {
-     width: 110px;
-     height: 110px;
-     top: 15%;
-     right: 65%;
-     animation-delay: 0.8s;
- }
+ /* Floating Food */
+.floating-food { position: relative; height: 100%; min-height: 300px; }
+
+.food-float { position: absolute; border-radius: 20px; animation: float 3s ease-in-out infinite; }
+
+.food-card-img {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.food-card-img:hover { transform: scale(1.05); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); }
+
+.food-card-img img { width: 80px; height: 80px; object-fit: cover; border-radius: 15px; }
+
+.food-card-img span { font-size: 0.85rem; font-weight: 600; color: #4a0000; margin-top: 10px; }
+
+/* Posisi dan ukuran masing-masing food - DIPERBESAR */
+.food-1 { width: 150px; height: 150px; top: 0%; right: 15%; animation-delay: 0s; z-index: 5; }
+.food-2 { width: 130px; height: 130px; bottom: 10%; right: 0%; animation-delay: 0.3s; z-index: 4; }
+.food-3 { width: 120px; height: 120px; top: 40%; right: 30%; animation-delay: 0.6s; z-index: 3; }
+.food-4 { width: 140px; height: 140px; bottom: 20%; right: 40%; animation-delay: 0.9s; z-index: 2; }
+.food-5 { width: 125px; height: 125px; top: 15%; right: 50%; animation-delay: 1.2s; z-index: 6; }
  
  @keyframes float {
      0%, 100% { transform: translateY(0px); }
@@ -714,3 +709,30 @@
      font-size: 1.2rem;
      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
  }
+ /* ============================================ */
+/* TOMBOL LOGOUT PREMIUM */
+/* ============================================ */
+
+.btn-logout {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+}
+
+.btn-logout:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    transform: translateY(-2px);
+    color: white;
+}
+ 
