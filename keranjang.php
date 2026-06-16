@@ -1,6 +1,6 @@
 <?php
 /**
- * keranjang.php - Halaman keranjang belanja pembeli
+ * keranjang.php - Halaman keranjang belanja 
  */
 
 session_start();
