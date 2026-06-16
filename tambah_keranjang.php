@@ -1,6 +1,6 @@
 <?php
 /**
- * tambah_keranjang.php - API untuk menambah item ke keranjang
+ * tambah_keranjang.php - API untuk menambah barang ke keranjang
  */
 
 session_start();
