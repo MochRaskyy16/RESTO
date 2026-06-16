@@ -20,7 +20,7 @@ $catatan = mysqli_real_escape_string($conn, $_POST['catatan']);
 // Generate nomor pesanan unik
 $no_pesanan = 'INV' . date('Ymd') . rand(1000, 9999);
 
-// Hitung total
+// Hitung total pesanan
 $total = 0;
 foreach ($_SESSION['keranjang'] as $item) {
     $total += $item['harga'] * $item['qty'];

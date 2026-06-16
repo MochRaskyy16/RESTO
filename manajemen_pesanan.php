@@ -6,7 +6,7 @@
 
 session_start();
 
-// Cek apakah admin sudah login
+// Cek apakah admin sudah login atau belum
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: login.php");
     exit();

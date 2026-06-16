@@ -1,6 +1,6 @@
 <?php
 /**
- * index_pembeli.php - Halaman untuk pembeli (tanpa login)
+ * index_pembeli.php - Halaman untuk pembeli (tanpa harus login)
  */
 
 require_once 'database.php';
