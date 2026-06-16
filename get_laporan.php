@@ -8,7 +8,7 @@ require_once 'database.php';
 
 header('Content-Type: application/json');
 
-// Ambil parameter filter tanggal
+
 $dari = isset($_GET['dari']) ? $_GET['dari'] : date('Y-m-01');
 $sampai = isset($_GET['sampai']) ? $_GET['sampai'] : date('Y-m-d');
 
