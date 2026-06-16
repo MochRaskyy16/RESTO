@@ -1,21 +1,15 @@
 <?php
-/**
- * dashboard_analitik.php - Halaman Dashboard Analitik Penjualan
- * Tampilan selaras dengan dashboard premium
- */
+
 
 require_once 'database.php';
 
-// ==============================================
-// CEK KONEKSI DATABASE
-// ==============================================
+
 if (!$conn) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
 
-// ==============================================
+
 // 1. AMBIL DATA STATISTIK RINGKASAN
-// ==============================================
 
 // Total Penjualan Hari Ini
 $query_hari_ini = "SELECT COALESCE(SUM(total_harga), 0) as total FROM transaksi WHERE DATE(tanggal) = CURDATE()";
@@ -48,9 +42,7 @@ $menu_terlaris = mysqli_fetch_assoc($result_menu_terlaris);
 $nama_menu_terlaris = $menu_terlaris ? $menu_terlaris['nama_menu'] : 'Belum ada data';
 $jumlah_menu_terlaris = $menu_terlaris ? $menu_terlaris['total_terjual'] : 0;
 
-// ==============================================
 // 2. DATA UNTUK GRAFIK BATANG (MENU TERLARIS)
-// ==============================================
 
 $query_bar_chart = "SELECT 
     m.nama_menu, 
@@ -71,9 +63,9 @@ while ($row = mysqli_fetch_assoc($result_bar_chart)) {
     $menu_sales[] = (int)$row['total_terjual'];
 }
 
-// ==============================================
+
 // 3. DATA UNTUK GRAFIK GARIS (TREND MENU TERLARIS)
-// ==============================================
+
 
 // Cari menu terlaris sepanjang masa
 $query_top_menu = "SELECT 
@@ -126,9 +118,8 @@ if ($top_menu_id > 0) {
 
 $line_chart_data = array_values($line_chart_sales);
 
-// ==============================================
+
 // 4. DATA PENJUALAN 1 MINGGU KEBELAKANG & 1 MINGGU KEDEPAN
-// ==============================================
 
 $dates = [];
 $current = strtotime('-7 days');
@@ -179,9 +170,9 @@ while ($row = mysqli_fetch_assoc($result_penjualan)) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <style>
-        /* ============================================ */
+       
         /* PREMIUM DASHBOARD CSS - SAMA DENGAN DASHBOARD */
-        /* ============================================ */
+        
         
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
         
@@ -464,9 +455,7 @@ while ($row = mysqli_fetch_assoc($result_penjualan)) {
     <i class="fas fa-bars"></i>
 </button>
 
-<!-- ============================================ -->
-<!-- SIDEBAR PREMIUM -->
-<!-- ============================================ -->
+
 <div class="sidebar" id="sidebar">
     <div class="sidebar-logo">
         <h3>
@@ -529,9 +518,9 @@ while ($row = mysqli_fetch_assoc($result_penjualan)) {
     </div>
 </div>
 
-<!-- ============================================ -->
+
 <!-- MAIN CONTENT -->
-<!-- ============================================ -->
+
 <div class="main-content">
     
     <!-- HERO BANNER MINI -->
@@ -695,9 +684,9 @@ function toggleSidebar() {
     if (sidebar) sidebar.classList.toggle('show');
 }
 
-// ==============================================
+
 // GRAFIK BATANG (COLUMN CHART)
-// ==============================================
+
 const barCtx = document.getElementById('barChart').getContext('2d');
 new Chart(barCtx, {
     type: 'bar',
@@ -765,9 +754,9 @@ new Chart(barCtx, {
     }
 });
 
-// ==============================================
+
 // GRAFIK GARIS (LINE CHART)
-// ==============================================
+
 const lineCtx = document.getElementById('lineChart').getContext('2d');
 new Chart(lineCtx, {
     type: 'line',
