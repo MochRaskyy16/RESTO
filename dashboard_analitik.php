@@ -9,7 +9,7 @@ if (!$conn) {
 }
 
 
-// 1. AMBIL DATA STATISTIK RINGKASAN
+
 
 // Total Penjualan Hari Ini
 $query_hari_ini = "SELECT COALESCE(SUM(total_harga), 0) as total FROM transaksi WHERE DATE(tanggal) = CURDATE()";
@@ -64,7 +64,7 @@ while ($row = mysqli_fetch_assoc($result_bar_chart)) {
 }
 
 
-// 3. DATA UNTUK GRAFIK GARIS (TREND MENU TERLARIS)
+
 
 
 // Cari menu terlaris sepanjang masa
