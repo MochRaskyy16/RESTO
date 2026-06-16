@@ -1,6 +1,6 @@
 <?php
 /**
- * logout.php - Proses logout admin
+ * logout.php - Proses logout 
  */
 
 session_start();
