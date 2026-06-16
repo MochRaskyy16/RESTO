@@ -1,8 +1,5 @@
 <?php
-/**
- * database.php - File koneksi database
- * Menggunakan MySQLi untuk koneksi ke database
- */
+
 
 $host = 'localhost';      // Server database
 $user = 'root';           // Username database (default root)
