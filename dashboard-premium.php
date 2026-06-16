@@ -19,9 +19,9 @@ require_once 'database.php';
 
 require_once 'database.php';
 
-// ==============================================
+
 // CEK KONEKSI DATABASE
-// ==============================================
+
 if (!$conn) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
