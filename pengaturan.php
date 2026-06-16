@@ -10,7 +10,7 @@ if (!$conn) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
 
-// Proses simpan pengaturan
+// Proses simpan
 $success = '';
 $error = '';
 
