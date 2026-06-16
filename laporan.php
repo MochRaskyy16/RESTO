@@ -1,6 +1,6 @@
 <?php
 /**
- * laporan.php - Halaman Laporan Penjualan Restoran
+ * laporan.php - Halaman Laporan Penjualan
  */
 
 require_once 'database.php';
