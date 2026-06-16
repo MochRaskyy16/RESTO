@@ -14,7 +14,7 @@ if (!$conn) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
 
-// Set charset ke UTF-8
+
 mysqli_set_charset($conn, "utf8");
 
 // Catatan: File ini akan di-include di semua halaman CRUD
