@@ -1,6 +1,6 @@
 <?php
 /**
- * checkout.php - Proses checkout pesanan
+ * checkout.php - Proses checkout 
  */
 
 session_start();
