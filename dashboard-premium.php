@@ -4,7 +4,7 @@ session_start();
 
 // Cek apakah admin sudah login
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-   
+    // Jika belum login, redirect ke halaman login
     header("Location: login.php");
     exit();
 }
@@ -19,9 +19,9 @@ require_once 'database.php';
 
 require_once 'database.php';
 
-
+// ==============================================
 // CEK KONEKSI DATABASE
-
+// ==============================================
 if (!$conn) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
@@ -199,33 +199,79 @@ $result = mysqli_query($conn, $query);
         .sidebar-nav .nav-link:hover { background: rgba(255, 255, 255, 0.15); color: white; transform: translateX(5px); }
         .sidebar-nav .nav-link.active { background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)); color: white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
         
-        .sidebar-user {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ffd89b, #c7e9fb);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #4b0000;
-        }
-        .user-info h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
-        .user-info p { margin: 0; font-size: 0.7rem; opacity: 0.7; }
-        .user-status { width: 10px; height: 10px; background: #4ade80; border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        
+        /* Sidebar User */
+.sidebar-user {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffd89b, #c7e9fb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4b0000;
+}
+
+.user-info h6 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.user-info p {
+    margin: 0;
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+
+.user-status {
+    width: 10px;
+    height: 10px;
+    background: #4ade80;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Tombol Logout */
+.btn-logout {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-logout:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    transform: translateY(-2px);
+    color: white;
+}
         /* Main Content */
         .main-content { margin-left: 280px; padding: 20px; transition: all 0.3s ease; }
         
@@ -486,6 +532,9 @@ $result = mysqli_query($conn, $query);
 <!-- ============================================ -->
 <!-- SIDEBAR PREMIUM -->
 <!-- ============================================ -->
+<!-- ============================================ -->
+<!-- SIDEBAR PREMIUM - TANPA LAPORAN & PENGATURAN -->
+<!-- ============================================ -->
 <div class="sidebar" id="sidebar">
     <div class="sidebar-logo">
         <h3>
@@ -515,16 +564,6 @@ $result = mysqli_query($conn, $query);
                 <i class="fas fa-chart-line"></i> Analitik Penjualan
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="laporan.php">
-                <i class="fas fa-file-alt"></i> Laporan
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="pengaturan.php">
-                <i class="fas fa-cog"></i> Pengaturan
-            </a>
-        </li>
     </ul>
     
     <div class="sidebar-user">
@@ -544,7 +583,6 @@ $result = mysqli_query($conn, $query);
     </div>
 </div>
 </div>
-
 <!-- ============================================ -->
 <!-- MAIN CONTENT -->
 <!-- ============================================ -->
