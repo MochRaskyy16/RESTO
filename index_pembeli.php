@@ -1,6 +1,6 @@
 <?php
 /**
- * index_pembeli.php - Halaman untuk pembeli (tanpa harus login)
+ * index_pembeli.php - Halaman untuk pembeli (tanpa login)
  */
 
 require_once 'database.php';
@@ -40,9 +40,49 @@ foreach ($_SESSION['keranjang'] as $item) {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-        }
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #fff9f0 0%, #ffe6cc 100%);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background gambar makanan */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('assets/img/burger.jpeg');
+    background-repeat: repeat;
+    background-size: 300px;
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('assets/img/minuman.png');
+    background-repeat: repeat;
+    background-size: 230px;
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 0;
+    background-position: 75px 75px;
+}
+
+/* Konten di atas background */
+.container, .navbar, .hero-section {
+    position: relative;
+    z-index: 1;
+}
         
         .navbar {
             background: linear-gradient(135deg, #4a0000, #7a0000);
