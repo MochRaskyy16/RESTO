@@ -1,6 +1,6 @@
 <?php
 /**
- * keranjang.php - Halaman keranjang belanja 
+ * keranjang.php - Halaman keranjang belanja pembeli
  */
 
 session_start();
@@ -31,9 +31,49 @@ foreach ($keranjang as $item) {
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-        }
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #fff9f0 0%, #ffe6cc 100%);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background gambar makanan */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('assets/img/burger.jpeg');
+    background-repeat: repeat;
+    background-size: 300px;
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 0;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('assets/img/minuman.png');
+    background-repeat: repeat;
+    background-size: 230px;
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 0;
+    background-position: 75px 75px;
+}
+
+/* Konten di atas background */
+.container, .navbar, .hero-section {
+    position: relative;
+    z-index: 1;
+}
         
         .navbar {
             background: linear-gradient(135deg, #4a0000, #7a0000);
@@ -73,6 +113,28 @@ foreach ($keranjang as $item) {
             background: linear-gradient(135deg, #4a0000, #7a0000);
             color: white;
             padding: 12px;
+        }
+        
+        /* ============================================ */
+        /* PERBAIKAN: Validasi No Meja */
+        /* ============================================ */
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        .invalid-feedback {
+            display: none;
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        .invalid-feedback.show {
+            display: block;
         }
     </style>
 </head>
@@ -131,29 +193,42 @@ foreach ($keranjang as $item) {
                 </table>
             </div>
             
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <label class="form-label">Nama Pemesan</label>
-                    <input type="text" id="nama_pemesan" class="form-control" placeholder="Masukkan nama Anda">
+            <!-- ============================================ -->
+            <!-- FORM DENGAN VALIDASI NO MEJA                  -->
+            <!-- ============================================ -->
+            <form id="checkoutForm" onsubmit="return validateForm(event)">
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Nama Pemesan</label>
+                        <input type="text" id="nama_pemesan" class="form-control" placeholder="Masukkan nama Anda" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">No Meja</label>
+                        <input type="number" id="no_meja" class="form-control" 
+                               placeholder="Masukkan nomor meja" 
+                               min="1" step="1"
+                               oninput="validateNoMeja(this)"
+                               required>
+                        <div class="invalid-feedback" id="noMejaError">
+                            <i class="fas fa-exclamation-circle me-1"></i> 
+                            Nomor meja harus lebih dari 0!
+                        </div>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <label class="form-label">Catatan (opsional)</label>
+                        <textarea id="catatan" class="form-control" rows="2" placeholder="Contoh: Tidak pedas, ekstra sambal..."></textarea>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">No Meja</label>
-                    <input type="text" id="no_meja" class="form-control" placeholder="Masukkan nomor meja">
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="index_pembeli.php" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Lanjut Belanja
+                    </a>
+                    <button type="submit" class="btn btn-premium">
+                        <i class="fas fa-check-circle me-2"></i> Checkout
+                    </button>
                 </div>
-                <div class="col-12 mt-3">
-                    <label class="form-label">Catatan (opsional)</label>
-                    <textarea id="catatan" class="form-control" rows="2" placeholder="Contoh: Tidak pedas, ekstra sambal..."></textarea>
-                </div>
-            </div>
-            
-            <div class="d-flex justify-content-between mt-4">
-                <a href="index_pembeli.php" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left"></i> Lanjut Belanja
-                </a>
-                <button class="btn btn-premium" onclick="checkout()">
-                    <i class="fas fa-check-circle me-2"></i> Checkout
-                </button>
-            </div>
+            </form>
             
         <?php else: ?>
             <div class="text-center py-5">
@@ -168,15 +243,47 @@ foreach ($keranjang as $item) {
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
+// ============================================
+// VALIDASI NO MEJA - TIDAK BOLEH MINUS ATAU 0
+// ============================================
+function validateNoMeja(input) {
+    var value = parseInt(input.value);
+    var errorDiv = document.getElementById('noMejaError');
+    
+    if (isNaN(value) || value <= 0) {
+        input.classList.add('is-invalid');
+        errorDiv.classList.add('show');
+        return false;
+    } else {
+        input.classList.remove('is-invalid');
+        errorDiv.classList.remove('show');
+        return true;
+    }
+}
+
+// ============================================
+// UPDATE QUANTITY
+// ============================================
 function updateQty(id, qty) {
+    if (qty < 1) {
+        Swal.fire('Error', 'Jumlah minimal 1', 'error');
+        location.reload();
+        return;
+    }
+    
     fetch('update_keranjang.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `id=${id}&qty=${qty}`
+        body: 'id=' + id + '&qty=' + qty
     }).then(() => location.reload());
 }
 
+// ============================================
+// HAPUS ITEM
+// ============================================
 function hapusItem(id) {
     Swal.fire({
         title: 'Hapus Item?',
@@ -190,26 +297,67 @@ function hapusItem(id) {
             fetch('hapus_item_keranjang.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `id=${id}`
+                body: 'id=' + id
             }).then(() => location.reload());
         }
     });
 }
 
-function checkout() {
-    const nama_pemesan = document.getElementById('nama_pemesan').value;
-    const no_meja = document.getElementById('no_meja').value;
-    const catatan = document.getElementById('catatan').value;
+// ============================================
+// VALIDASI FORM SEBELUM CHECKOUT
+// ============================================
+function validateForm(event) {
+    event.preventDefault();
     
-    if (!nama_pemesan) {
-        Swal.fire('Error', 'Nama pemesan harus diisi', 'error');
-        return;
+    var nama = document.getElementById('nama_pemesan').value.trim();
+    var noMeja = document.getElementById('no_meja');
+    var noMejaValue = parseInt(noMeja.value);
+    var errorDiv = document.getElementById('noMejaError');
+    
+    // Cek nama pemesan
+    if (nama === '') {
+        Swal.fire('Error', 'Nama pemesan harus diisi!', 'error');
+        document.getElementById('nama_pemesan').focus();
+        return false;
     }
+    
+    // Cek no meja
+    if (isNaN(noMejaValue) || noMejaValue <= 0 || noMeja.value === '') {
+        noMeja.classList.add('is-invalid');
+        errorDiv.classList.add('show');
+        Swal.fire('Error', 'Nomor meja harus lebih dari 0!', 'error');
+        noMeja.focus();
+        return false;
+    }
+    
+    // Jika semua valid, lanjutkan checkout
+    checkout();
+    return false;
+}
+
+// ============================================
+// CHECKOUT
+// ============================================
+function checkout() {
+    var nama_pemesan = document.getElementById('nama_pemesan').value;
+    var no_meja = document.getElementById('no_meja').value;
+    var catatan = document.getElementById('catatan').value;
+    
+    // Tampilkan loading
+    Swal.fire({
+        title: 'Memproses...',
+        text: 'Mohon tunggu sebentar',
+        icon: 'info',
+        showConfirmButton: false,
+        allowOutsideClick: false
+    });
     
     fetch('checkout.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `nama_pemesan=${encodeURIComponent(nama_pemesan)}&no_meja=${encodeURIComponent(no_meja)}&catatan=${encodeURIComponent(catatan)}`
+        body: 'nama_pemesan=' + encodeURIComponent(nama_pemesan) + 
+              '&no_meja=' + encodeURIComponent(no_meja) + 
+              '&catatan=' + encodeURIComponent(catatan)
     })
     .then(response => response.json())
     .then(data => {
@@ -219,10 +367,12 @@ function checkout() {
         } else {
             Swal.fire('Gagal!', data.message, 'error');
         }
+    })
+    .catch(error => {
+        Swal.fire('Error!', 'Terjadi kesalahan pada server', 'error');
     });
 }
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
